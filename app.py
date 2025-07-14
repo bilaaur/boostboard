@@ -5,8 +5,8 @@ import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+print("DATABASE URL:", app.config['SQLALCHEMY_DATABASE_URI'])
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://railway:xxx@postgres.railway.internal:5432/railway'
 
@@ -143,14 +143,14 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        if len(username) > 8 or len(password) > 8:
-            flash('Username and password max 8 characters!')
+        if len(username) > 50 or len(password) > 50:
+            flash('Username and password max 50 characters!')
             return redirect(url_for('login'))
 
         user = User.query.filter_by(username=username, password=password).first()
         if user:
             session['username'] = user.username
-            return redirect(url_for('tasks'))
+            return redirect(url_for('home'))
         else:
             flash('Invalid username or password!')
             return redirect(url_for('login'))
