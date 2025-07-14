@@ -5,17 +5,14 @@ import requests
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-# Database setup
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 db = SQLAlchemy(app)
 
-# User Model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
 
-# Task Model
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(255), nullable=False)
@@ -43,9 +40,11 @@ def get_motivation_quote():
 
 @app.route('/tasks')
 def home():
+    print("SESSION:", session)
     if 'username' in session:
         user = User.query.filter_by(username=session['username']).first()
         if not user:
+            print("USER NOT FOUND")
             session.pop('username', None)
             return redirect(url_for('login'))
 
@@ -61,6 +60,7 @@ def home():
         quote = get_motivation_quote()
         return render_template('index.html', username=user.username, tasks=tasks, quote=quote)
     
+    print("NO SESSION")
     return redirect(url_for('login'))
 
 @app.route('/add_task', methods=['POST'])
