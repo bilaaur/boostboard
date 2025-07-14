@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BoostBoard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <!-- Floating Bubbles -->
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+<button id="themeToggle" title="Toggle Dark Mode">🌙 | ☀️</button>
+  <div class="container">
+    <h1>Welcome to <span style="color:#6c63ff;">BoostBoard</span></h1>
+    <p>Your daily task manager & motivation hub 🚀</p>
+
+    <div style="margin-top: 30px;">
+      <div class="button-group">
+        <a href="{{ url_for('login') }}"><button>Login</button></a>
+        <a href="{{ url_for('register') }}"><button>Register</button></a>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

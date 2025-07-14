@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Task & Motivation Board</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+
+  <div class="container">
+    <div class="header-bar">
+      <h1>Welcome, {{ username }}!</h1>
+      <button id="themeToggle" title="Toggle Dark Mode">🌙 | ☀️</button>
+    </div>
+
+    <p class="quote">✨ {{ quote }} ✨</p>
+
+    <p id="progress" style="margin: 16px 0; font-weight: bold;"></p>
+
+    <!-- Add Task Form -->
+    <form action="/add_task" method="POST" class="task-form">
+      <input type="text" name="task_text" placeholder="New task..." required>
+      <label for="category">Category:</label>
+      <select name="category" id="category">
+        <option value="Normal">🌿 Normal</option>
+        <option value="Important">✨ Important</option>
+        <option value="Urgent">📌 Urgent</option>
+      </select>
+      <button type="submit">➕</button>
+    </form>
+
+    <!-- Search -->
+    <input type="text" id="searchInput" placeholder="Search task..." onkeyup="searchTasks()">
+
+    <!-- Task List -->
+    <ul id="taskList">
+      {% for task in tasks %}
+      <li class="{{ 'completed' if task.completed }}">
+        <span>
+          {{ task.text }}
+          {% if task.category %}
+          <span class="badge {{ task.category.lower() }}">{{ task.category }}</span>
+          {% endif %}
+        </span>
+        <div class="actions">
+          <a href="/toggle_complete/{{ task.id }}" title="Mark Complete">✅</a>
+          <form action="/edit_task/{{ task.id }}" method="POST" class="inline-form">
+            <input type="text" name="new_text" placeholder="Edit..." maxlength="255" required>
+            <button type="submit" title="Edit Task">✏️</button>
+          </form>
+          <a href="/delete_task/{{ task.id }}" title="Delete Task">❌</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <a href="/logout" class="logout-btn">Logout</a>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
