@@ -7,6 +7,9 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://railway:xxx@postgres.railway.internal:5432/railway'
+
 db = SQLAlchemy(app)
 
 class User(db.Model):
