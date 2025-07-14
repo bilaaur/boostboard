@@ -15,7 +15,7 @@ Many individuals struggle with productivity and task management due to a lack of
 - **JavaScript (vanilla)** — client-side interaction
 - **jQuery** — for AJAX task search
 - **ZenQuotes API** — for daily motivational quotes
-- **Vercel** — deployment
+- **Render** — deployment
 
 ## ✨ Features
 
