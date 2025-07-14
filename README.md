@@ -50,7 +50,7 @@ The AI tools were exclusively used during the **development and documentation ph
 
 ## 🌐 Deployment Link
 
-[Live Application Here](https://your-app-deployment-link.com)
+[Live Application Here](https://web-production-d9749.up.railway.app)
 
 ---
 
