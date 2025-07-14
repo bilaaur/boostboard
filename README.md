@@ -9,7 +9,7 @@ Many individuals struggle with productivity and task management due to a lack of
 ## 🚀 Technologies Used
 
 - **Python (Flask)** — backend framework
-- **SQLite** — database
+- **Postgres** — database
 - **HTML5** — markup language
 - **CSS3** — styling
 - **JavaScript (vanilla)** — client-side interaction
