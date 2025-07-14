@@ -23,6 +23,7 @@ class Task(db.Model):
     category = db.Column(db.String(20), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+@app.route('/')
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
@@ -40,8 +41,7 @@ def get_motivation_quote():
     except:
         return "Stay positive, work hard, make it happen. — Unknown"
 
-# Home / Task Page
-@app.route('/')
+@app.route('/tasks')
 def home():
     if 'username' in session:
         user = User.query.filter_by(username=session['username']).first()
@@ -63,7 +63,6 @@ def home():
     
     return redirect(url_for('login'))
 
-# Add Task
 @app.route('/add_task', methods=['POST'])
 def add_task():
     if 'username' not in session:
@@ -77,8 +76,6 @@ def add_task():
     db.session.commit()
     return redirect(url_for('home'))
 
-
-# Delete Task
 @app.route('/delete_task/<int:task_id>')
 def delete_task(task_id):
     task = Task.query.get(task_id)
@@ -86,7 +83,6 @@ def delete_task(task_id):
     db.session.commit()
     return redirect(url_for('home'))
 
-# Toggle Complete Task
 @app.route('/toggle_complete/<int:task_id>')
 def toggle_complete(task_id):
     task = Task.query.get(task_id)
@@ -94,7 +90,6 @@ def toggle_complete(task_id):
     db.session.commit()
     return redirect(url_for('home'))
 
-# Edit Task
 @app.route('/edit_task/<int:task_id>', methods=['POST'])
 def edit_task(task_id):
     task = Task.query.get(task_id)
@@ -103,7 +98,6 @@ def edit_task(task_id):
     db.session.commit()
     return redirect(url_for('home'))
 
-# Search Task (AJAX)
 @app.route('/search_tasks')
 def search_tasks():
     keyword = request.args.get('q')
@@ -112,29 +106,24 @@ def search_tasks():
     result = [{"id": t.id, "text": t.text, "completed": t.completed} for t in tasks]
     return jsonify(result)
 
-# Register Route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username'].strip()
         password = request.form['password'].strip()
 
-        # Validasi: tidak boleh kosong
         if not username or not password:
             flash('Username and password cannot be empty!')
             return redirect(url_for('register'))
 
-        # Validasi: password harus tepat 8 karakter
         if len(password) != 8:
             flash('Password must be exactly 8 characters!')
             return redirect(url_for('register'))
 
-        # Validasi: username sudah ada
         if User.query.filter_by(username=username).first():
             flash('Username already exists!')
             return redirect(url_for('register'))
 
-        # Simpan user baru
         new_user = User(username=username, password=password)
         db.session.add(new_user)
         db.session.commit()
@@ -144,7 +133,6 @@ def register():
 
     return render_template('register.html')
 
-# Login Route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -158,21 +146,19 @@ def login():
         user = User.query.filter_by(username=username, password=password).first()
         if user:
             session['username'] = user.username
-            return redirect(url_for('home'))
+            return redirect(url_for('tasks'))
         else:
             flash('Invalid username or password!')
             return redirect(url_for('login'))
 
     return render_template('login.html')
 
-# Logout Route
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     flash('Logged out successfully.')
     return redirect(url_for('dashboard'))
 
-# Create Database
 with app.app_context():
     db.create_all()
 

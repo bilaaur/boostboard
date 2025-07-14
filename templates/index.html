@@ -19,8 +19,6 @@
     <p class="quote">✨ {{ quote }} ✨</p>
 
     <p id="progress" style="margin: 16px 0; font-weight: bold;"></p>
-
-    <!-- Add Task Form -->
     <form action="/add_task" method="POST" class="task-form">
       <input type="text" name="task_text" placeholder="New task..." required>
       <label for="category">Category:</label>
@@ -32,10 +30,8 @@
       <button type="submit">➕</button>
     </form>
 
-    <!-- Search -->
     <input type="text" id="searchInput" placeholder="Search task..." onkeyup="searchTasks()">
 
-    <!-- Task List -->
     <ul id="taskList">
       {% for task in tasks %}
       <li class="{{ 'completed' if task.completed }}">
