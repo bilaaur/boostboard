@@ -6,7 +6,20 @@ import os
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-db_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or "sqlite:///database.db"
+default_sqlite = "sqlite:////tmp/database.db" if os.getenv("VERCEL") else "sqlite:///database.db"
+
+
+def find_db_url():
+    # Cari URL Postgres dari env var mana pun (DATABASE_URL, POSTGRES_URL, STORAGE_URL, dst.)
+    for key in ("DATABASE_URL", "POSTGRES_URL", "STORAGE_URL"):
+        if os.getenv(key):
+            return os.getenv(key)
+    cands = [(k, v) for k, v in os.environ.items() if v.startswith(("postgres://", "postgresql://"))]
+    # utamakan koneksi pooled, hindari yang UNPOOLED / NON_POOLING
+    cands.sort(key=lambda kv: ("UNPOOLED" in kv[0] or "NON_POOLING" in kv[0], kv[0]))
+    return cands[0][1] if cands else None
+
+db_url = find_db_url() or default_sqlite
 # "postgres://" ditolak SQLAlchemy; paksa driver psycopg2 (sesuai requirements.txt)
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
@@ -31,6 +44,15 @@ class Task(db.Model):
     completed = db.Column(db.Boolean, default=False)
     category = db.Column(db.String(20), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+# ---- DEBUG SEMENTARA: aktif hanya kalau env DEBUG_ERRORS=1 ----
+if os.getenv("DEBUG_ERRORS") == "1":
+    import traceback
+    @app.errorhandler(Exception)
+    def show_error(e):
+        db.session.rollback()
+        return "<pre>" + traceback.format_exc() + "</pre>", 500
+# ----------------------------------------------------------------
 
 @app.route('/')
 @app.route('/dashboard')
