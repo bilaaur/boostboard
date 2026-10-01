@@ -5,8 +5,16 @@ import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
-print("DATABASE URL:", app.config['SQLALCHEMY_DATABASE_URI'])
+
+db_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or "sqlite:///database.db"
+# "postgres://" ditolak SQLAlchemy; paksa driver psycopg2 (sesuai requirements.txt)
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+elif db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+# Cegah error "SSL connection has been closed" / koneksi idle putus
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True, "pool_recycle": 300}
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://railway:xxx@postgres.railway.internal:5432/railway'
 
@@ -33,7 +41,7 @@ import requests
 
 def get_motivation_quote():
     try:
-        response = requests.get("https://zenquotes.io/api/random")
+        response = requests.get("https://zenquotes.io/api/random", timeout=3)
         if response.status_code == 200:
             data = response.json()
             return data[0]['q'] + " — " + data[0]['a']
